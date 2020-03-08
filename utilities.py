@@ -1,19 +1,10 @@
 from modules.sdn_applications.floodlight.rest_client_for_floodlight import ControllerApi as FloodlightAPI
 from threading import Thread
 
-#from main import PG_manager_ip,PG_manager_port,PG_manager_port_test,controller_ip,controller_port,helperIPAddress,helperMACAddress,ipToMACAddressMap,MACtoIPAddressMap,topo_links
-
 
 ## JSON Pretty Printer
-
 import pprint
 
-# from ...shared_libes.RestClient import Rest
-
-
-
-
-#   from  BLP.lp_solver import network_monitoring_ILP,run_blp
 
 PG_manager_ip = "10.0.0.202"
 PG_manager_port = 5000
@@ -27,28 +18,17 @@ controller_port = 8080
 helperIPAddress = "10.0.0.250"
 helperMACAddress = "00:00:00:00:00:fa"
 
-# ipToMACAddressMap = {}
-# MACtoIPAddressMap = {}
-
-# topo_links = {}
 pp = pprint.PrettyPrinter(depth=2)
 
 test_hosts_last_octet_is_greater_than = 100
 
 
-
-# class TopoInfoStruct:
-#     def __init__(self):
-#         self.ipToMACAddressMap = {}
-#         self.MACtoIPAddressMap = {}
-
-#         self.topo_links = {}
-
 class TopoInteractions:
     def __init__(self):
         self.ipToMACAddressMap = {}
         self.MACtoIPAddressMap = {}
-
+        self.ipToMACAddressMap[helperIPAddress] = helperMACAddress
+        self.MACtoIPAddressMap[helperMACAddress] = helperIPAddress
         self.topo_links = {}
 
     def __convert_pathes_to_route(self,path):
@@ -65,8 +45,7 @@ class TopoInteractions:
         '''
         # route = path
         # global ipToMACAddressMap, topo_links
-        self.ipToMACAddressMap[helperIPAddress] = helperMACAddress
-        self.MACtoIPAddressMap[helperMACAddress] = helperIPAddress
+        
         # print (ipToMACAddressMap)
 
         route = [None] * len(path)
@@ -99,13 +78,15 @@ class TopoInteractions:
                 route[i][j] = (in_port, path[i][j], out_port)
         return route
 
-    def push_flows(self,pathes, interval=0.005):
+    def push_flows(self,pathes, interval=0.005,simulation=False):
         """
         pathes = 
         [
             ['10.0.0.1',('s1-eth1','00:00:00:00:00:00:00:01','s1-eth2'),('s2-eth1','00:00:00:00:00:00:00:02','s2-eth4'),'10.0.0.2'],
             ['10.0.0.2',('s2-eth4','00:00:00:00:00:00:00:02','s2-eth3'),('s3-eth1','00:00:00:00:00:00:00:03','s3-eth2'),'10.0.0.3']
         ]
+
+        simulation: if true just rules will be created and won't be installed really on switches
 
         list_of_traffic_pattern=
         {
@@ -117,21 +98,21 @@ class TopoInteractions:
         """
         path_detector = {}  # path_detector[(src_host_ip,dst_host_ip)] = path_number
 
-        list_of_traffic_pattern = {}
+       # list_of_traffic_pattern = {}
 
-        f_path = open("../latest/outputs/other/pathes.txt", "w+")
-        list_to_str = ' '.join([str(elem) for elem in pathes])
+        # f_path = open("../latest/outputs/other/pathes.txt", "w+")
+        # list_to_str = ' '.join([str(elem) for elem in pathes])
 
-        f_path.write(list_to_str)
-        f_path.close()
+        # f_path.write(list_to_str)
+        # f_path.close()
 
         '''count number of pathes between host couples'''
         pathes = self.__convert_pathes_to_route(pathes)
 
-        f_route = open("../latest/outputs/other/routes.txt", "w+")
-        list_to_str = ' '.join([str(elem) for elem in pathes])
-        f_route.write(list_to_str)
-        f_route.close()
+        # f_route = open("../latest/outputs/other/routes.txt", "w+")
+        # list_to_str = ' '.join([str(elem) for elem in pathes])
+        # f_route.write(list_to_str)
+        # f_route.close()
 
         global helperIPAddress
         #print ("pathes: ",pathes)
@@ -152,11 +133,14 @@ class TopoInteractions:
 
             if (src_host_ip, dst_host_ip) not in path_detector:
                 path_detector[(src_host_ip, dst_host_ip)] = 1
-                list_of_traffic_pattern[src_host_ip] = []
+                #list_of_traffic_pattern[src_host_ip] = []
             else:
                 path_detector[(src_host_ip, dst_host_ip)] += 1
 
-        flows = ""  # for debug
+        flows = []  # for debug
+        controller_api = FloodlightAPI(controller_ip, controller_port)
+
+
         # for path in pathes:
         for j in range(0, len(pathes)):
             #src_host_ip = MACtoIPAddressMap[pathes[j][0]]
@@ -175,14 +159,16 @@ class TopoInteractions:
                 dpid = pathes[j][i][1]
                 ip_protocol = "0x1"
 
-                controller_api = FloodlightAPI(controller_ip, controller_port)
+                
                 if i != len(pathes[j]) - 2:
                     # ok = controller_api.add_flow(in_port,dpid,src_host_ip,dst_host_ip,out_port,ip_protocol,ip_tos)
-                    ok, flow = controller_api.add_flow(in_port, dpid, src_host_ip, dst_host_ip, out_port, ip_protocol,
-                                                    ip_tos)
-                    flows = flows + "\n" + json.dumps(flow)  # for debug
-                    from time import sleep
-                    sleep(interval)
+                    if not simulation:
+                        ok, flow = controller_api.add_flow(in_port, dpid, src_host_ip, dst_host_ip, out_port, ip_protocol,ip_tos)
+                        from time import sleep
+                        sleep(interval)
+                    #flows = flows + "\n" + json.dumps(flow)  # for debug
+                    flows.append(flow)
+
                 else:
                     # if dpid==nat_switch_dpid and i==len(path)-2: #last switch
                     # swap dst_ip with src_ip  and dst_eth with src_eth
@@ -195,23 +181,38 @@ class TopoInteractions:
                     # icmpv4_type  = 0
 
                     # ok = controller_api.add_flow(in_port,dpid,src_host_ip,helperIPAddress,out_port,ip_protocol,ip_tos,set_eth_src,set_eth_dst,set_ipv4_src,set_ipv4_dst,priority=32768)
-                    ok, flow = controller_api.add_flow(in_port, dpid, src_host_ip, helperIPAddress, out_port, ip_protocol,
-                                                    ip_tos, set_eth_src, set_eth_dst, set_ipv4_src, set_ipv4_dst,
-                                                    priority=32768)
-                    flows = flows + "\n" + json.dumps(flow)  # for debug
-                    from time import sleep
-                    sleep(interval)
+                    if not simulation:
+                        ok, flow = controller_api.add_flow(
+                            in_port,
+                            dpid, 
+                            src_host_ip,
+                            helperIPAddress,
+                            out_port,
+                            ip_protocol,
+                            ip_tos,
+                            set_eth_src,
+                            set_eth_dst,
+                            set_ipv4_src,
+                            set_ipv4_dst,
+                            priority=32768
+                        )
+                        from time import sleep
+                        sleep(interval)
+
+                    #flows = flows + "\n" + json.dumps(flow)  # for debug
+                    flows.append(flow)
+                    
                 if ok != True:
-                    return False
+                    return False,flows
 
                 path = _replace_dst_ip_with_helper_ip_address(path)
 
-        # for debug
-        f = open("../latest/outputs/other/flow_entries.txt", "w+")
-        f.write(flows)
-        f.close()
+        # # for debug
+        # f = open("../latest/outputs/other/flow_entries.txt", "w+")
+        # f.write(flows)
+        # f.close()
         #  # print ("_____________push_flows_____________")
-        return True
+        return True,flows
 
 def add_dic_to_file(dic,filepath):
     f = open(filepath, "w+")
@@ -491,3 +492,7 @@ class Rest():
         conn.close()
 
         return ret
+
+def create_dir_recursively (dir):
+    import pathlib
+    pathlib.Path(dir).mkdir(parents=True, exist_ok=True)
