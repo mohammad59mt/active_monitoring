@@ -1,4 +1,4 @@
-from utilities import add_dic_to_file,delete_test_hosts_from_topo_matrix,ThreadWithReturnValue,generate_flows,get_test_hosts_traffic_pattern_from_link_info,convert_host_ip_to_sw_dpid,generate_flows_to_test_hosts,TopoInteractions
+from utilities import add_dic_to_file,delete_test_hosts_from_topo_matrix,ThreadWithReturnValue,generate_flows,get_test_hosts_traffic_pattern_from_link_info,convert_host_ip_to_sw_dpid,generate_flows_to_test_hosts,TopoInteractions,create_dir_recursively
 import pprint
 from modules.sdn_applications.floodlight.rest_client_for_floodlight import ControllerApi as FloodlightAPI
 import utilities
@@ -43,14 +43,22 @@ def main():
         print ("no host is detected, plz pingall in mininet")
         return 2
 
+    import os 
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+
+    from pathlib import Path
+
+    base_output_path = Path(dir_path) / Path("evaluation") / Path("emulation") / Path("latest") / Path("outputs")
+    create_dir_recursively (base_output_path)
+    create_dir_recursively (base_output_path / Path("other"))
     print ("topo_neighbourhood_matrix: ",topo_neighbourhood_matrix)
-    add_dic_to_file(topo_neighbourhood_matrix,"../latest/outputs/1.topology_matrix.txt")
+    add_dic_to_file(topo_neighbourhood_matrix,base_output_path/"1.topology_matrix.txt")
     print ("topo_links: ",topo_interactions.topo_links)
-    add_dic_to_file(topo_interactions.topo_links,"../latest/outputs/other/topo_links.txt")
+    add_dic_to_file(topo_interactions.topo_links,base_output_path / Path("other") / "topo_links.txt")
     print ("ipToMACAddressMap: ",topo_interactions.ipToMACAddressMap)
-    add_dic_to_file(topo_interactions.ipToMACAddressMap,"../latest/outputs/other/ip_to_mac_add_map.txt")
+    add_dic_to_file(topo_interactions.ipToMACAddressMap,base_output_path / Path("other") / "ip_to_mac_add_map.txt")
     print ("MACtoIPAddressMap: ",topo_interactions.MACtoIPAddressMap)
-    add_dic_to_file(topo_interactions.MACtoIPAddressMap,"../latest/outputs/other/mac_to_ip_address_map.txt")
+    add_dic_to_file(topo_interactions.MACtoIPAddressMap,base_output_path / Path("other") / "mac_to_ip_address_map.txt")
 
     ''' 
     Output of LP algorithm, by Mehdi
@@ -58,11 +66,11 @@ def main():
     from modules.path_and_flow_selector_heuristic_PSF import heuristic_for_ILP
     length_of_probes_array = [2, 5]
     topo = topo_neighbourhood_matrix
-    node_based_path_array = heuristic_for_ILP(topo=topo, length_of_probes_array=length_of_probes_array, debug=False)
+    node_based_path_array,_,_,_ = heuristic_for_ILP(topo=topo, length_of_probes_array=length_of_probes_array, debug=False)
 
     print ("node_based_path_array: ",node_based_path_array)
-    base_output_path = "../latest/outputs/"
-    pathes_path = base_output_path + "2.Pathes.txt"
+    
+    pathes_path = base_output_path / "2.Pathes.txt"
     add_dic_to_file(node_based_path_array,pathes_path)
 
 
@@ -79,10 +87,14 @@ def main():
     '''
     Push flow entries to switches, by Hesam
     '''
-    ok = topo_interactions.push_flows(node_based_path_array)
+    ok,flows = topo_interactions.push_flows(node_based_path_array)
     if ok != True:
         print ("Error: Can't push flow entries.")
         return
+
+    add_dic_to_file(flows,base_output_path / Path("other") / "rules.txt")
+
+    
     '''
     Command Packet Traffic Manager to generate traffic in network, by Hesam
     '''
@@ -146,11 +158,11 @@ def main():
             end_to_end_delay_matrix_list[flows["flow_label"]] = {src_ip: flows}
 
     # print ("list_of_traffic_patterns: ",list_of_traffic_patterns )
-    add_dic_to_file(list_of_traffic_patterns, "../latest/outputs/other/list_of_traffic_patterns.txt")
-    add_dic_to_file(end_to_end_delay_matrix, "../latest/outputs/other/end_to_end_delay_matrix_dic.txt")
-    add_dic_to_file(end_to_end_delay_matrix_list, "../latest/outputs/3.end_to_end_delay_matrix.txt")
+    add_dic_to_file(list_of_traffic_patterns, base_output_path / Path("other") / "list_of_traffic_patterns.txt")
+    add_dic_to_file(end_to_end_delay_matrix, base_output_path / Path("other") / "end_to_end_delay_matrix_dic.txt")
+    add_dic_to_file(end_to_end_delay_matrix_list, base_output_path / "3.TGM_end_to_end_delay_matrix.txt")
 
-    add_dic_to_file(end_to_end_delay_matrix_test, "../latest/outputs/other/end_to_end_delay_matrix_dic_test.txt")
+    add_dic_to_file(end_to_end_delay_matrix_test, base_output_path / Path("other") /"end_to_end_delay_matrix_dic_test.txt")
 
     '''
     PSO Part
@@ -189,7 +201,7 @@ def main():
 
     ########delay array###########
     #base_output_path = "./latest/outputs/"
-    end_to_end_delay_file_path = base_output_path+"3.TGM_end_to_end_delay_matrix.txt"
+    end_to_end_delay_file_path = base_output_path/"3.TGM_end_to_end_delay_matrix.txt"
     array_of_delays = []
     with open(end_to_end_delay_file_path) as end_to_end_delay_file:
         str_from_file = end_to_end_delay_file.read().replace("\'", "\"")
@@ -206,23 +218,25 @@ def main():
     print (array_of_delays)
     print (node_based_path_array)
     print (real_link_delays)
-    add_dic_to_file(array_of_delays, base_output_path+"other/DMI/pso_array_of_delays.txt")
-    add_dic_to_file(node_based_path_array, base_output_path+"other/DMI/pso_node_based_path_array.txt")
-    add_dic_to_file(real_link_delays, base_output_path+"other/real_link_delays_by_test_hosts.txt")
+    create_dir_recursively (base_output_path / Path("DMI"))
+
+    add_dic_to_file(array_of_delays, base_output_path / Path("DMI") / "pso_array_of_delays.txt")
+    add_dic_to_file(node_based_path_array, base_output_path / Path("DMI") / "pso_node_based_path_array.txt")
+    add_dic_to_file(real_link_delays, base_output_path / Path("other") /"real_link_delays_by_test_hosts.txt")
     
     
     measured_link_delay = link_delay_measurement_PSO(array_of_delays, node_based_path_array, debug=False)
 
-    add_dic_to_file (measured_link_delay, base_output_path+"4.DMI_measured_link_delay.txt")
-    add_dic_to_file (measured_link_delay, base_output_path+"DMI/measured_link_delay.txt")
+    #add_dic_to_file (measured_link_delay, base_output_path / Path("other") / "4.DMI_measured_link_delay.txt")
+    add_dic_to_file (measured_link_delay, base_output_path / Path("DMI") / "measured_link_delay.txt")
 
     # print("Max error per one link: ", max_difference)
     # print('Summation of all link delays error: ', link_delay_error)
 
-    max_difference, link_delay_error= link_delay_measurement_and_comparison_PSO(array_of_delays, node_based_path_array, real_link_delays, debug=False)
+    max_difference, link_delay_error= link_delay_measurement_and_comparison_PSO(array_of_delays, node_based_path_array, real_link_delays, debug=False,save_to_file_dir= base_output_path / "4.DMI_measured_link_delay.txt")
 
-    add_dic_to_file (max_difference, base_output_path+"DMI/max difference.txt")
-    add_dic_to_file (link_delay_error, base_output_path+"DMI/link delay error.txt" )
+    add_dic_to_file (max_difference, base_output_path / Path("DMI") / "max difference.txt")
+    add_dic_to_file (link_delay_error, base_output_path / Path("DMI") / "link delay error.txt" )
     
 
 #    actual_res = []
