@@ -313,7 +313,7 @@ def link_delay_measurement_PSO(array_of_delays, node_based_path_array, init_pop_
 
     return  measured_link_delay
 
-def link_delay_measurement_and_comparison_PSO(array_of_delays, node_based_path_array, real_link_delays, init_pop_min=1, init_pop_max =10, min=1, max=100, pop_size = 100,max_itereration= 150, debug=False):
+def link_delay_measurement_and_comparison_PSO(array_of_delays, node_based_path_array, real_link_delays, init_pop_min=1, init_pop_max =10, min=1, max=100, pop_size = 100,max_itereration= 150, debug=False, save_to_file_dir=None):
     if pop_size < 50: print("Population must be more than 50"); return
     random.seed(400)
     node_based_path_array = remove_hosts(node_based_path_array)
@@ -342,15 +342,23 @@ def link_delay_measurement_and_comparison_PSO(array_of_delays, node_based_path_a
 
     comparison, max_difference = compare_resutls(real_link_delay=real_link_delays, measured_link_delay=measured_link_delay)
     link_delay_error = 0
-    print('\n(source node, destination node): real delay --> measured delay')
+    str_to_file = ""
+    #print('\n(source node, destination node): real delay --> measured delay')
+    str_to_file = '\n(source node, destination node): real delay --> measured delay'
     for link in comparison:
-        print(link,':','{0:2.2f}'.format(comparison[link][0]),'-->','{0:2.2f}'.format(comparison[link][1]))
+        str_to_file = str_to_file +"\n{0}: {1:2.2f}-->{2:2.2f}".format(link,comparison[link][0],comparison[link][1])
+        #print(link,':','{0:2.2f}'.format(comparison[link][0]),'-->','{0:2.2f}'.format(comparison[link][1]))
         link_delay_error += abs(comparison[link][0]-comparison[link][1])
 
     pso.print_error(decimal_size=2)
-    print("Max error per one link: ", max_difference)
-    print('Summation of all link delays error: ', link_delay_error)
+    str_to_file = str_to_file + "\n" + "Max error per one link: "+str(max_difference)
+    #print("Max error per one link: ", max_difference)
+    str_to_file = str_to_file + "\n" + 'Summation of all link delays error: '+ str(link_delay_error)
+    #print('Summation of all link delays error: ', link_delay_error)
 
+    if save_to_file_dir is not None:
+        with open (save_to_file_dir,"+w") as f:
+            f.write(str_to_file)
     return max_difference,link_delay_error
 
 # array_of_delays = [7, 11, 18, 9, 4, 17, 9, 13, 17, 4, 35, 35, 30, 36, 32, 29, 31, 36, 35, 34, 35, 29, 22, 35, 24, 37, 29, 34, 29, 30, 37, 29, 38, 30]
