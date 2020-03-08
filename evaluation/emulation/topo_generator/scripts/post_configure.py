@@ -37,17 +37,17 @@
     
 
 ###validDelayMatrix commented###    
-   switchesList = []
-   for sw1 in net.switches:
-       for sw2 in net.switches:
-           if str(sw1.dpid)+"|"+str(sw2.dpid) not in validDelayMatrix:
-               if str(sw1.dpid).strip(":")!=data['management_switch']['dpid'] and str(sw2.dpid).strip(":")!=data['management_switch']['dpid']:
-                   validDelayMatrix[str(sw1.dpid)+"|"+str(sw2.dpid)]=0
+    switchesList = []
+    for sw1 in net.switches:
+        for sw2 in net.switches:
+            if str(sw1.dpid)+"|"+str(sw2.dpid) not in validDelayMatrix:
+                if str(sw1.dpid).strip(":")!=data['management_switch']['dpid'] and str(sw2.dpid).strip(":")!=data['management_switch']['dpid']:
+                    validDelayMatrix[str(sw1.dpid)+"|"+str(sw2.dpid)]=0
 
-   print (validDelayMatrix)
-   f_actual= open("../latest/outputs/actual_link_delay_matrix.txt","w+")
-   f_actual.write(str(validDelayMatrix))
-   f_actual.close()
+    print (validDelayMatrix)
+    f_actual= open("../latest/outputs/actual_link_delay_matrix.txt","w+")
+    f_actual.write(str(validDelayMatrix))
+    f_actual.close()
 ###validDelayMatrix commented###    
         
     info( '*** Adding helper arp entry to all hosts\n')

@@ -1,6 +1,6 @@
 {
    "controller":{
-      "intf":"ens38",
+      "intf":"enp9s0",
       "ip":"10.0.0.200",
       "rest_port":8080,
       "name":"floodlight"

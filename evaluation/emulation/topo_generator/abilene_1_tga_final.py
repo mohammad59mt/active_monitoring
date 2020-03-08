@@ -39,6 +39,7 @@ def myNetwork():
     info( '*** Adding controller\n' )
     c0=net.addController(name='c0',
                       controller=RemoteController,
+                      ip='127.0.0.1',
                       protocol='tcp',
                       port=6653)
 
@@ -83,34 +84,124 @@ def myNetwork():
 
     info( '*** Add hosts\n')
     h1 = net.addHost('h1', cls=Host, ip='10.0.0.1', defaultRoute=None)
-    h2 = net.addHost('h2', cls=Host, ip='10.0.0.2', defaultRoute=None)
-    h3 = net.addHost('h3', cls=Host, ip='10.0.0.3', defaultRoute=None)
-    h4 = net.addHost('h4', cls=Host, ip='10.0.0.4', defaultRoute=None)
-    h5 = net.addHost('h5', cls=Host, ip='10.0.0.5', defaultRoute=None)
+#    h2 = net.addHost('h2', cls=Host, ip='10.0.0.2', defaultRoute=None)
 
     info( '*** Add links\n')
-    net.addLink(s11, s2)
-    net.addLink(s11, s4)
-    net.addLink(s11, s7)
-    net.addLink(s1, s10)
-    net.addLink(s1, s6)
-    net.addLink(s3, s8)
-    net.addLink(s3, s4)
-    net.addLink(s4, s5)
-    net.addLink(s4, s8)
-    net.addLink(s4, s9)
-    net.addLink(s4, s10)
-    net.addLink(s5, s6)
-    net.addLink(s6, s10)
-    net.addLink(s6, s7)
-    net.addLink(s6, s8)
-    net.addLink(s8, s9)
-    net.addLink(s9, s10)
+    validDelayMatrix = {}
+
+    s_1_s_2 = {'delay':'4ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_1_s_2"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_1_s_2,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s1, s2, cls=TCLink , **s_1_s_2)
+
+
+    s_2_s_4 = {'delay':'3ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_2_s_4"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_2_s_4,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s2, s4, cls=TCLink , **s_2_s_4)
+
+
+    s_4_s_1 = {'delay':'6ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_4_s_1"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_4_s_1,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s4, s1, cls=TCLink , **s_4_s_1)
+
+
+    s_2_s_3 = {'delay':'3ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_2_s_3"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_2_s_3,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s2, s3, cls=TCLink , **s_2_s_3)
+
+
+    s_3_s_11 = {'delay':'9ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_3_s_11"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_3_s_11,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s3, s11, cls=TCLink , **s_3_s_11)
+
+
+    s_11_s_10 = {'delay':'9ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_11_s_10"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_11_s_10,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s11, s10, cls=TCLink , **s_11_s_10)
+
+
+    s_10_s_9 = {'delay':'9ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_10_s_9"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_10_s_9,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s10, s9, cls=TCLink , **s_10_s_9)
+
+
+    s_9_s_8 = {'delay':'8ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_9_s_8"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_9_s_8,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s9, s8, cls=TCLink , **s_9_s_8)
+
+
+    s_7_s_8 = {'delay':'5ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_7_s_8"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_7_s_8,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s7, s8, cls=TCLink , **s_7_s_8)
+
+
+    s_7_s_6 = {'delay':'3ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_7_s_6"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_7_s_6,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s7, s6, cls=TCLink , **s_7_s_6)
+
+
+    s_6_s_10 = {'delay':'9ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_6_s_10"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_6_s_10,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s6, s10, cls=TCLink , **s_6_s_10)
+
+
+    s_6_s_5 = {'delay':'2ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_6_s_5"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_6_s_5,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s6, s5, cls=TCLink , **s_6_s_5)
+
+
+    s_5_s_11 = {'delay':'8ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_5_s_11"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_5_s_11,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s5, s11, cls=TCLink , **s_5_s_11)
+
+
+    s_5_s_4 = {'delay':'8ms'}
+    my_var_name = [ k for k,v in locals().iteritems() if k == "s_5_s_4"][0]
+    k1,k2,v = get_key_and_value_for_actual_link_delay(s_5_s_4,my_var_name)
+    validDelayMatrix [k1] =v
+    validDelayMatrix [k2] =v
+    net.addLink(s5, s4, cls=TCLink , **s_5_s_4)
+
     net.addLink(h1, s1)
-    net.addLink(h2, s2)
-    net.addLink(h3, s9)
-    net.addLink(h4, s5)
-    net.addLink(h5, s7)
+    #net.addLink(h2, s7)
 
 
 
@@ -140,17 +231,17 @@ def myNetwork():
         controller.start()
 
     info( '*** Starting switches\n')
-    net.get('s10').start([c0])
-    net.get('s6').start([c0])
-    net.get('s11').start([c0])
-    net.get('s8').start([c0])
-    net.get('s1').start([c0])
-    net.get('s3').start([c0])
     net.get('s5').start([c0])
-    net.get('s7').start([c0])
+    net.get('s1').start([c0])
     net.get('s2').start([c0])
+    net.get('s6').start([c0])
+    net.get('s7').start([c0])
     net.get('s9').start([c0])
+    net.get('s10').start([c0])
+    net.get('s11').start([c0])
+    net.get('s3').start([c0])
     net.get('s4').start([c0])
+    net.get('s8').start([c0])
 
 
 
@@ -178,16 +269,16 @@ def myNetwork():
           
           
     info( '*** Post configure coordinator and traffic manager hosts\n')#config coordinator switch, so coordinator can talk with controller
-    traffic_manager_host.cmdPrint('python3 ../../packet_generator/packet_generator_manager.py&')
-    traffic_manager_host.cmdPrint('python3 ../../packet_generator_test/manager.py&')
+    traffic_manager_host.cmdPrint('python3 ../../modules/traffic_generator/traffic_generator_manager_TGM.py&')
+    traffic_manager_host.cmdPrint('python3 ../../modules/traffic_generator/traffic_generator_manager_TGM.py --port 5050&')
     
     info( '*** Running agents on hosts\n')
     for host in net.hosts:
         if "th" in host.name:
-            host.cmdPrint('python3 ../../packet_generator_test/agent.py&')
+            host.cmdPrint('python3 ../../modules/traffic_generator/traffic_generator_agent_TGA.py&')
             continue
         if "th" not in host.name and "tm_h" not in host.name and "coord_h" not in host.name:
-            host.cmdPrint('python3 ../../packet_generator/packet_generator_agent.py&')
+            host.cmdPrint('python3 ../../modules/traffic_generator/traffic_generator_agent_TGA.py&')
 
             
 
@@ -199,17 +290,17 @@ def myNetwork():
     
 
 ###validDelayMatrix commented###    
-#    switchesList = []
-#    for sw1 in net.switches:
-#        for sw2 in net.switches:
-#            if str(sw1.dpid)+"|"+str(sw2.dpid) not in validDelayMatrix:
-#                if str(sw1.dpid).strip(":")!=data['management_switch']['dpid'] and str(sw2.dpid).strip(":")!=data['management_switch']['dpid']:
-#                    validDelayMatrix[str(sw1.dpid)+"|"+str(sw2.dpid)]=0
+    switchesList = []
+    for sw1 in net.switches:
+        for sw2 in net.switches:
+            if str(sw1.dpid)+"|"+str(sw2.dpid) not in validDelayMatrix:
+                if str(sw1.dpid).strip(":")!=data['management_switch']['dpid'] and str(sw2.dpid).strip(":")!=data['management_switch']['dpid']:
+                    validDelayMatrix[str(sw1.dpid)+"|"+str(sw2.dpid)]=0
 
-#    print (validDelayMatrix)
-#    f_actual= open("../latest/outputs/actual_link_delay_matrix.txt","w+")
-#    f_actual.write(str(validDelayMatrix))
-#    f_actual.close()
+    print (validDelayMatrix)
+    f_actual= open("../latest/outputs/actual_link_delay_matrix.txt","w+")
+    f_actual.write(str(validDelayMatrix))
+    f_actual.close()
 ###validDelayMatrix commented###    
         
     info( '*** Adding helper arp entry to all hosts\n')

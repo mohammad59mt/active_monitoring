@@ -38,7 +38,9 @@ def convert_id_to_mac (id):
     return __convert_to_colon_separated (format(id,'00000000000012x'))
 
 
-PERCENT_OF_HOSTS_IN_EACH_TOPO = [1,5,10,20,30]
+PERCENT_OF_HOSTS_IN_EACH_TOPO = []#[1,5,10,20,30]
+NUMBER_OF_HOSTS_IN_EACH_TOPO = range(1,100)
+MAX_PERCENT_OF_HOST = 30
 
 start_time = time.time()
 xml_dir =  pathlib.Path(__file__).parent /  "xml"
@@ -46,7 +48,9 @@ topolgy_matrix_dir =  pathlib.Path(__file__).parent /  "topology_matrix"
 
 final_topo = {}
 for file_name in get_file_names_in_a_directory(xml_dir):
-    leaf_switches = []
+    edge_switches = []
+    
+
     edge_counter = {}  #{00:00:00:00:00:00:00:01:2,00:00:00:00:00:00:00:02:1}
     if not file_name.endswith(".xml"):
         continue
@@ -71,39 +75,61 @@ for file_name in get_file_names_in_a_directory(xml_dir):
                 src_sw_dpid = convert_id_to_dpid(int(i.attrib['source'])+1)
                 dst_sw_dpid = convert_id_to_dpid(int(i.attrib['target'])+1)
                 edge_counter[src_sw_dpid]=edge_counter[src_sw_dpid]+1
+                edge_counter[dst_sw_dpid]=edge_counter[dst_sw_dpid]+1
                 final_topo[(src_sw_dpid,dst_sw_dpid,'s')] = 1
                 final_topo[(dst_sw_dpid,src_sw_dpid,'s')] = 1
 
     for sw,edge_count in edge_counter.items():
-        if edge_count == 1:
-            leaf_switches.append(sw)
-            
+        if edge_count is  1 or 2:
+            edge_switches.append(sw)
+        
+
     min_percent_avaiable  = int(1*100/len(switches))
-    max_percent_available = int(len(leaf_switches)*100/len(switches)) 
-    #print (len(leaf_switches)*100/len(switches))
+    max_percent_available = int(len(edge_switches)*100/len(switches)) 
+    #print (len(edge_switches)*100/len(switches))
 
     ##connect hosts to the topo##
-    for percent_of_host in PERCENT_OF_HOSTS_IN_EACH_TOPO:
-        if percent_of_host < min_percent_avaiable:
-            continue
+    for number_of_hosts in NUMBER_OF_HOSTS_IN_EACH_TOPO:
+        # if len(PERCENT_OF_HOSTS_IN_EACH_TOPO) is 0:
+        #     break
+      
+
+    
+    ##connect hosts to the topo by count##
+    # for number_of_hosts in NUMBER_OF_HOSTS_IN_EACH_TOPO:
+        # if len(NUMBER_OF_HOSTS_IN_EACH_TOPO) is 0:
+        #     break
+        # if number_of_hosts < min_percent_avaiable:
+        #     continue
+
+
 
         #import ipaddress
         #ip_address_int = int(ipaddress.ip_address('10.0.0.1')) #167772161
         #host_mac_int = 1
-        # add a host to every switches
+        # add a host to all switches
         added_host_counter = 0
-        for sw in leaf_switches:
+        for sw in edge_switches:
             #host_ip =  ipaddress.ip_address(ip_address_int).__str__()
             host_mac = sw[6:]
             final_topo[(host_mac,sw,'h')] = 1
             added_host_counter = added_host_counter+1
             host_percent = added_host_counter*100/len(switches)
-            if host_percent>=percent_of_host:
+            # if host_percent>=percent_of_host:
+            #     break
+           
+            if added_host_counter == number_of_hosts:
                 break
             #ip_address_int = ip_address_int + 1
-        out_file_name = file_name.replace('.graphml.xml','')+"_"+str(percent_of_host)+".txt"
+        out_file_name = file_name.replace('.graphml.xml','')+"_"+str(added_host_counter)+"_host_"+str(round(host_percent))+"_percent.txt"
         add_dic_to_file(final_topo,topolgy_matrix_dir/out_file_name)
         print ("%s converted to topology_matrix --> %s"%(file_name,out_file_name))
+
+        added_host_counter = added_host_counter+1
+        host_percent = added_host_counter*100/len(switches)
+        if host_percent > MAX_PERCENT_OF_HOST:
+            break
+            
 
 print ("\nDone! It only took %s ms"%(round((time.time()-start_time)*1000)))
 

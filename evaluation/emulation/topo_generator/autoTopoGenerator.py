@@ -94,11 +94,12 @@ with open("%s") as config_file:
             print ('please specify input_script_path using -i switch or set it in *.json config') 
             return
     
-    if output_script_path ==None  and 'codeGeneration' in data and 'output_script_path' in data['codeGeneration']:
-        output_script_path      = base_dir+data['codeGeneration']['output_script_path']
-    else:
-        print ('please specify output_script_path using -o switch or set it in *.json config') 
-        return
+    if output_script_path ==None:
+        if 'codeGeneration' in data and 'output_script_path' in data['codeGeneration']:
+            output_script_path      = base_dir+data['codeGeneration']['output_script_path']
+        else:
+            print ('please specify output_script_path using -o switch or set it in *.json config') 
+            return
     
     if post_configure_script_path == None and 'codeGeneration' in data and 'post_configure_script_path' in data['codeGeneration']:
         post_configure_script_path = base_dir+data['codeGeneration']['post_configure_script_path']
