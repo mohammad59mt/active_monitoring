@@ -6,13 +6,14 @@ import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 import csv
+from utilities import TopoInteractions
 
 ###configs###
 max_hop_count_path = 29
 SEQUENTIAL_LEN_OF_PROBE_ARRAYS = True
-#TOPOLOGY_EXCLUDE = ["Geant"]
-TOPOLOGY_EXCLUDE = [" "]
-DURATION_RUN_LIMIT_MS = 100000
+TOPOLOGY_EXCLUDE = ["Geant"]
+#TOPOLOGY_EXCLUDE = [" "]
+DURATION_RUN_LIMIT_MS = 0
 
 def get_file_names_in_a_directory(dir):
     import os
@@ -65,6 +66,9 @@ import progressbar as pb
     {}
 ]
 """
+
+
+
 for file_name in get_file_names_in_a_directory(topology_matrix_dir):
     go_out = False
     for topo_name in TOPOLOGY_EXCLUDE:
@@ -93,30 +97,66 @@ for file_name in get_file_names_in_a_directory(topology_matrix_dir):
         csv_writer_all = csv.writer(csv_file_all,delimiter =' ',quotechar =',',quoting=csv.QUOTE_MINIMAL)
         csv_writer_good = csv.writer(csv_file_good,delimiter =' ',quotechar =',',quoting=csv.QUOTE_MINIMAL)
 
-        csv_writer_all.writerow(["#number_of_probes","#number_of_included_links","#run_duration_ms","#len(length_of_probes_array)","#number_of_existing_links","#number_of_switches","#number_of_hosts","#links_monitored_percent"])
-        csv_writer_good.writerow(["#number_of_probes","#number_of_included_links","#run_duration_ms","#len(length_of_probes_array)","#number_of_existing_links","#number_of_switches","#number_of_hosts","#links_monitored_percent"])
+        #                good_outputs[-1]["number_of_rules"] = number_of_rules
+
+        csv_writer_all.writerow(["#number_of_probes","#number_of_included_links","#run_duration_ms","#len(length_of_probes_array)","#number_of_existing_links","#number_of_switches","#percent_of_hosts","#links_monitored_percent","#number_of_hosts","#number_of_rules"])
+        csv_writer_good.writerow(["#number_of_probes","#number_of_included_links","#run_duration_ms","#len(length_of_probes_array)","#number_of_existing_links","#number_of_switches","#percent_of_hosts","#links_monitored_percent","#number_of_hosts","number_of_rules"])
 
         
         
         initial_length_of_probes_array = range(2,3)
         nodeBasedPath_arrayOfList,number_of_probes,number_of_existing_links,number_of_included_links = heuristic_for_ILP(topo=topology_matrix, length_of_probes_array=initial_length_of_probes_array, debug=False)
         
+        
+        ##calculate number of flows##
+        # topo_interactions = TopoInteractions()
+        # for item in topology_matrix:
+        # #for link in links_resp:
+        #     src_dpid = link['src-switch']
+        #     src_port = link['src-port']
+        #     dst_dpid = link['dst-switch']
+        #     dst_port = link['dst-port']
+        #     if src_dpid!=coordinator_and_manager_sw_dpid and dst_dpid!=coordinator_and_manager_sw_dpid:
+        #         #print ("src_dpid: ",src_dpid)
+        #         #print ("dst_dpid: ",dst_dpid)
+        #         #print ("coordinator_and_manager_sw_dpid: ",coordinator_and_manager_sw_dpid)
+        #         self.__topology_graph[(src_dpid,dst_dpid,'s')]+=1
+        #         self.__topology_links[(src_dpid,dst_dpid,'s')]=(src_port,dst_port)
+        #         self.__topology_graph[(dst_dpid,src_dpid,'s')]+=1
+        #         self.__topology_links[(dst_dpid,src_dpid,'s')]=(dst_port,src_port)
+
+        # ok,flows = topo_interactions.push_flows(nodeBasedPath_arrayOfList)
+        # if ok != True:
+        #     print ("Error: Creating rules")
+        #     continue
+        
+        number_of_rules = 0 #len (flows)
+
         switches = set()
         for item in topology_matrix:
             if item[2]=='s':
                 switches.add(item[0])
         number_of_switches = len (switches)
 
-        number_of_hosts = int(file_name.replace(".txt","").split("_")[1])
+        hosts = set()
+        for item in topology_matrix:
+            if item[2]=='h':
+                hosts.add(item[0])
+        number_of_hosts = len (hosts)
+
+        percent_of_hosts = int(file_name.replace(".txt","").split("_")[3])
+        final_output[-1]["percent_of_hosts"] = percent_of_hosts
         final_output[-1]["number_of_hosts"] = number_of_hosts
         final_output[-1]["number_of_switches"] = number_of_switches
         final_output[-1]["number_of_links"] = number_of_existing_links
+        final_output[-1]["number_of_rules"] = number_of_rules
 
         good_outputs[-1]["topo_name"] = final_output[-1]["topo_name"]
+        good_outputs[-1]["percent_of_hosts"] = percent_of_hosts
         good_outputs[-1]["number_of_hosts"] = number_of_hosts
         good_outputs[-1]["number_of_switches"] = number_of_switches
         good_outputs[-1]["number_of_links"] = number_of_existing_links
-
+        good_outputs[-1]["number_of_rules"] = number_of_rules
         final_output[-1]["runs_info"] = []
         good_outputs[-1]["runs_info"] = []
         
@@ -129,7 +169,7 @@ for file_name in get_file_names_in_a_directory(topology_matrix_dir):
             all_sets = get_all_subset(path_length_array)
 
         #initialize widgets
-        widgets = ['topo: %s, hosts: %s, switches: %s, links: %s, number of probe arrays: %s --> '%(final_output[-1]["topo_name"],final_output[-1]["number_of_hosts"],good_outputs[-1]["number_of_switches"],number_of_existing_links,len(all_sets)), pb.Percentage(), ' ', 
+        widgets = ['topo: %s, hosts: %s, switches: %s, links: %s, number of probe arrays: %s --> '%(final_output[-1]["topo_name"],final_output[-1]["percent_of_hosts"],good_outputs[-1]["number_of_switches"],number_of_existing_links,len(all_sets)), pb.Percentage(), ' ', 
             pb.Bar(marker=pb.RotatingMarker()), ' ', pb.ETA()]
 
 
@@ -145,17 +185,20 @@ for file_name in get_file_names_in_a_directory(topology_matrix_dir):
             end_time = time.time()
             run_duration_ms = round((end_time-start_time)*1000,3)
             links_monitored_percent = round(number_of_included_links*1.0/number_of_existing_links,2)*100
-            final_output[-1]["runs_info"].append({"number_of_probes":number_of_probes,"number_of_existing_links":number_of_existing_links,"number_of_included_links":number_of_included_links,"run_duration_ms":run_duration_ms,"length_of_probes_array":length_of_probes_array,"links_monitored_percent":links_monitored_percent})
+            final_output[-1]["runs_info"].append({"number_of_probes":number_of_probes,"number_of_existing_links":number_of_existing_links,"number_of_included_links":number_of_included_links,"run_duration_ms":run_duration_ms,"length_of_probes_array":length_of_probes_array,"links_monitored_percent":links_monitored_percent,"number_of_hosts":number_of_hosts,"number_of_rules":number_of_rules})
             
-            csv_writer_all.writerow([number_of_probes,number_of_included_links,run_duration_ms,len(length_of_probes_array),number_of_existing_links,number_of_switches,number_of_hosts,links_monitored_percent])
+            csv_writer_all.writerow([number_of_probes,number_of_included_links,run_duration_ms,len(length_of_probes_array),number_of_existing_links,number_of_switches,percent_of_hosts,links_monitored_percent,number_of_hosts,number_of_rules])
 
             if number_of_included_links == number_of_existing_links:
-                good_outputs[-1]["runs_info"].append({"number_of_probes":number_of_probes,"number_of_existing_links":number_of_existing_links,"number_of_included_links":number_of_included_links,"run_duration_ms":run_duration_ms,"length_of_probes_array":length_of_probes_array,"links_monitored_percent":links_monitored_percent})
-                csv_writer_good.writerow([number_of_probes,number_of_included_links,run_duration_ms,len(length_of_probes_array),number_of_existing_links,number_of_switches,number_of_hosts,links_monitored_percent])
+                good_outputs[-1]["runs_info"].append({"number_of_probes":number_of_probes,"number_of_existing_links":number_of_existing_links,"number_of_included_links":number_of_included_links,"run_duration_ms":run_duration_ms,"length_of_probes_array":length_of_probes_array,"links_monitored_percent":links_monitored_percent,"number_of_hosts":number_of_hosts,"number_of_rules":number_of_rules})
+                csv_writer_good.writerow([number_of_probes,number_of_included_links,run_duration_ms,len(length_of_probes_array),number_of_existing_links,number_of_switches,percent_of_hosts,links_monitored_percent,number_of_hosts,number_of_rules])
             i = i+1 
             timer.update(i)
-            if run_duration_ms>DURATION_RUN_LIMIT_MS:
+            if run_duration_ms>DURATION_RUN_LIMIT_MS and DURATION_RUN_LIMIT_MS is not 0:
                 print("duration run limit: %s"%(run_duration_ms))
+                break
+            if links_monitored_percent is 100:
+                print("100 percent of links monitored")
                 break
         write_object_to_file(final_output[-1],Path("evaluation/PSF") / Path(final_output[-1]["topo_name"]),Path("all_"+file_name))
         write_object_to_file(good_outputs[-1],Path("evaluation/PSF") / Path(final_output[-1]["topo_name"]),Path("good_"+file_name))
