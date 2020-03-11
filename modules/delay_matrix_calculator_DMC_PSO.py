@@ -56,7 +56,8 @@ def make_linear_equations(number_of_probes):
     number_of_unkowns = len(map_geneIndex_to_variableName)
     number_of_equations = number_of_probes
     b = [0 for _ in range(number_of_equations)]
-    a = [[0 for _ in range(number_of_equations)] for _ in range(number_of_unkowns)]
+    # a = [[0 for _ in range(number_of_equations)] for _ in range(number_of_unkowns)]
+    a = [[0 for _ in range(number_of_unkowns)] for _ in range(number_of_equations)]
     equation_index = 0
     for equation in aggregated_equations.split('abs')[1:]:
         equation = equation.replace('(','').replace(')+','').replace(')','')
