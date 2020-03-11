@@ -20,73 +20,41 @@ This class is implemented to do Rest Client tasks
 '''
 
 class Rest():
-
     def __init__(self, server,port,path):
-
         self.server = server
-
         self.port = port
-
         self.path = path
-
   
 
-    def get(self, data):
-
+    def get(self, data={}):
         ret = self.rest_call({}, 'GET')
-
         return json.loads(ret[2].decode('utf-8'))
 
-  
 
     def set(self, data):
-
         ret = self.rest_call(data, 'POST')
-
-        print ("set ret: ",ret)
-
         returned_data = json.loads(ret[2].decode('utf-8'))
-
         return ret[0] == 201, returned_data
+ 
 
-
-
-  
-
-    def remove(self, objtype, data):
-
+    def remove(self, data):
         ret = self.rest_call(data, 'DELETE')
-
         return ret[0] == 200
 
-  
 
     def rest_call(self, data, action):
-
         path = self.path
-
         headers = {
-
             'Content-type': 'application/json',
-
             'Accept': 'application/json',
-
             }
-
         body = json.dumps(data)
-
         conn = http.client.HTTPConnection(self.server, self.port)
-
         conn.request(action, path, body, headers)
-
         response = conn.getresponse()
-
         ret = (response.status, response.reason, response.read())
 
-        #print (ret)
-
         conn.close()
-
         return ret
 
 
@@ -116,7 +84,7 @@ class ControllerApi (object):
             for sw2 in switches:
                 self.__topology_graph[(sw1,sw2,'s')]=0
                     
-        print ("debug: Number of valid detected switches by controller: ",number_of_valid_detected_switches)
+        print ("Number of valid detected switches by controller: ",number_of_valid_detected_switches)
 
         return switches
 
@@ -165,7 +133,7 @@ class ControllerApi (object):
             except :
                 print ("Exception")
             
-        print ("debug: Number of valid detected hosts by controller: ",number_of_valid_detected_hosts)
+        print ("Number of valid detected hosts by controller: ",number_of_valid_detected_hosts)
         return hosts_resp['devices']
 
     def get_topo_from_controller(self):
@@ -195,22 +163,39 @@ class ControllerApi (object):
             "actions":"output="+str(out_port)
             }
         elif set_eth_src!="" and set_eth_dst!="" and set_ipv4_src!="" and set_ipv4_dst!="" :
-            #set_field=arp_tpa->10.0.0.2
-            actions="set_field=eth_src->%s,set_field=eth_dst->%s,set_field=ipv4_src->%s,set_field=ipv4_dst->%s,set_field=icmpv4_type->%s,output=%s"%(set_eth_src,set_eth_dst,set_ipv4_src,set_ipv4_dst,0,out_port)
-            flow={
-            "switch":str(dpid),
-            "name":str(randint(0,100))+"_"+str(dpid_int)+"_"+str(in_port)+"_"+str(out_port)+"_"+str(ip_tos)+"2_"+str(randint(0,100)),
-            "cookie":"0",
-            "priority":str(priority),
-            "in_port":str(in_port), 
-            "eth_type":"0x800",
-            "ipv4_src":ipv4_src,
-            "ipv4_dst":ipv4_dst,
-            "ip_proto": ip_protocol,
-            "ip_tos":str(ip_tos),           
-            "active":"true",
-            "instruction_apply_actions":actions
-            }
+            if in_port is not 0 and ip_tos is not 0:
+                #set_field=arp_tpa->10.0.0.2
+                actions="set_field=eth_src->%s,set_field=eth_dst->%s,set_field=ipv4_src->%s,set_field=ipv4_dst->%s,set_field=icmpv4_type->%s,output=%s"%(set_eth_src,set_eth_dst,set_ipv4_src,set_ipv4_dst,0,out_port)
+                flow={
+                "switch":str(dpid),
+                "name":str(randint(0,100))+"_"+str(dpid_int)+"_"+str(in_port)+"_"+str(out_port)+"_"+str(ip_tos)+"2_"+str(randint(0,100)),
+                "cookie":"0",
+                "priority":str(priority),
+                "in_port":str(in_port), 
+                "eth_type":"0x800",
+                "ipv4_src":ipv4_src,
+                "ipv4_dst":ipv4_dst,
+                "ip_proto": ip_protocol,
+                "ip_tos":str(ip_tos),           
+                "active":"true",
+                "instruction_apply_actions":actions
+                }
+            else:
+                actions="set_field=eth_src->%s,set_field=eth_dst->%s,set_field=ipv4_src->%s,set_field=ipv4_dst->%s,set_field=icmpv4_type->%s,output=%s"%(set_eth_src,set_eth_dst,set_ipv4_src,set_ipv4_dst,0,out_port)
+                flow={
+                "switch":str(dpid),
+                "name":str(randint(0,100))+"_"+str(dpid_int)+"_"+str(in_port)+"_"+str(out_port)+"_"+str(ip_tos)+"2_"+str(randint(0,100)),
+                "cookie":"0",
+                "priority":str(priority),
+                #"in_port":str(in_port), 
+                "eth_type":"0x800",
+                "ipv4_src":ipv4_src,
+                "ipv4_dst":ipv4_dst,
+                "ip_proto": ip_protocol,
+                #"ip_tos":str(ip_tos),           
+                "active":"true",
+                "instruction_apply_actions":actions
+                }
             #"actions":actions
             #"actions":"output=+str(out_port)+","+"set_eth_src='"+str(set_eth_src)+"',"+"set_eth_dst='"+str(set_eth_dst)+"',"+"set_ipv4_src='"+str(set_ipv4_src)+"',"+"set_ipv4_dst='"+str(set_ipv4_dst)+"'"%()
         else:
@@ -226,7 +211,11 @@ class ControllerApi (object):
         else:
             return False,""
 
+    def del_flows(self,ip_protocol="icmp"):
+        r = Rest(self.__controller_ip,self.__controller_port,'/wm/staticentrypusher/clear/all/json')
+        resp = r.get()
 
+        return resp
     
 if __name__=='__main__':
     a = ControllerApi("127.0.0.1",8080)
@@ -235,6 +224,7 @@ if __name__=='__main__':
 
     pp.pprint (c)
 
+    a.del_flows()
 
     # in_port=1
     # out_port=2
