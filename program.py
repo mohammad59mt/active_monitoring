@@ -35,13 +35,17 @@ def parse_flags():
     # parser.add_argument('--port', dest='port', help="Listen port for traffic manager REST API.")
     parser.add_argument('-l','--length_of_probes_array', nargs='+', help='<Required> Sets len of probes array for example:\n\t program.py -l 2 5', dest='length_of_probes_array',type=int, required=False)
     parser.add_argument('--debug', dest='debug', help="Print debug outputs.",action="store_true")
-    
+    parser.add_argument('--toponame', dest='topo_name', help="Topology name e.g. abilene",required=True,type=str)
+    parser.add_argument('--n', dest='number_of_hosts', help="Number of hosts in topology",required=True,type=int)
 
-    global length_of_probes_array,debug
+    global length_of_probes_array,debug,TOPOLOGY_NAME,NUMBER_OF_HOSTS
     args = parser.parse_args()
 
     length_of_probes_array = args.length_of_probes_array
     debug = args.debug
+
+    TOPOLOGY_NAME = args.topo_name#"abilene"
+    NUMBER_OF_HOSTS = args.number_of_hosts#2
 
 def get_all_subset(lst):
     import itertools 
@@ -72,6 +76,15 @@ def main():
 
     parse_flags()
 
+    ###configs###
+    max_hop_count_path = 12
+    SEQUENTIAL_LEN_OF_PROBE_ARRAYS = True
+    #TOPOLOGY_EXCLUDE = ["Geant"]
+    TOPOLOGY_EXCLUDE = [" "]
+    DURATION_RUN_LIMIT_MS = 0
+    #TOPOLOGY_NAME = "abilene"
+    #NUMBER_OF_HOSTS = 2
+
 
     '''
     Get topology from controller, by Hesam
@@ -89,14 +102,13 @@ def main():
         logger.info("no host is detected, plz pingall in mininet")
         return 2
     
-    topology_name = "abilene"
-    number_of_hosts = 1
 
+    global TOPOLOGY_NAME ,NUMBER_OF_HOSTS
     base_output_path = Path(dir_path) / Path("evaluation") / Path("emulation") / Path("latest") / Path("outputs")
     debug_dir = base_output_path / Path("debug")
     charts_data_dir = base_output_path / Path("charts_data")
     create_dir_recursively(charts_data_dir)
-    evaluation_csv_path = Path(dir_path) / Path("evaluation") / Path("emulation") / Path(topology_name+"_"+str(number_of_hosts)) / Path ("csv")
+    evaluation_csv_path = Path(dir_path) / Path("evaluation") / Path("emulation") / Path(TOPOLOGY_NAME+"_"+str(NUMBER_OF_HOSTS)) / Path ("csv")
 
     create_dir_recursively (evaluation_csv_path)
     create_dir_recursively (base_output_path)
@@ -111,18 +123,14 @@ def main():
     add_dic_to_file(topo_interactions.MACtoIPAddressMap,debug_dir / "mac_to_ip_address_map.txt")
 
     
-    ###configs###
-    max_hop_count_path = 29
-    SEQUENTIAL_LEN_OF_PROBE_ARRAYS = True
-    #TOPOLOGY_EXCLUDE = ["Geant"]
-    TOPOLOGY_EXCLUDE = [" "]
-    DURATION_RUN_LIMIT_MS = 0
+    
 
     with open(evaluation_csv_path /  "output_for_charts.csv", '+w', newline='') as csv_file_results:
+        
         csv_writer_results = csv.writer(csv_file_results,delimiter =' ',quotechar =',',quoting=csv.QUOTE_MINIMAL)
     
 
-        csv_writer_results.writerow(["#number_of_probes","#number_of_included_links","#run_duration_ms","#max_len_of_probes_array","#number_of_existing_links","#number_of_switches","#percent_of_hosts","#links_monitored_percent","#number_of_hosts","#number_of_rules","#number_of_flows","max_error_per_one_link", "summation_of_all_link_delays_error","#run_duration_ms_pso"])
+        csv_writer_results.writerow(["#number_of_probes","#number_of_included_links","#run_duration_ms","#max_len_of_probes_array","#number_of_existing_links","#number_of_switches","#percent_of_hosts","#links_monitored_percent","#number_of_hosts","#number_of_rules","#number_of_flows","max_error_per_one_link", "#summation_of_all_link_delays_error","#run_duration_ms_pso"])
         
         initial_length_of_probes_array = range(2,3)
         from modules.path_and_flow_selector_heuristic_PSF import heuristic_for_ILP
@@ -138,9 +146,9 @@ def main():
         for item in topo_neighbourhood_matrix:
             if item[2]=='h':
                 hosts.add(item[0])
-        number_of_hosts = len (hosts)
+        NUMBER_OF_HOSTS = len (hosts)
 
-        percent_of_hosts = int (100.0 * number_of_hosts / number_of_switches)
+        percent_of_hosts = int (100.0 * NUMBER_OF_HOSTS / number_of_switches)
 
         all_sets = None
         path_length_array = range(2,max_hop_count_path+1)    
@@ -155,7 +163,7 @@ def main():
             all_sets.append(length_of_probes_array)
         #initialize widgets
         import progressbar as pb
-        widgets = ['topo: %s, hosts: %s, switches: %s, links: %s, number of probe arrays: %s --> '%(topology_name,number_of_hosts,number_of_switches,number_of_existing_links,len(all_sets)), pb.Percentage(), ' ', 
+        widgets = ['topo: {}, hosts: {}, switches: {}, links: {} --> '.format(TOPOLOGY_NAME,NUMBER_OF_HOSTS,number_of_switches,number_of_existing_links), pb.Percentage(), ' ', 
         pb.Bar(marker=pb.RotatingMarker()), ' ', pb.ETA()]
 
 
@@ -165,7 +173,8 @@ def main():
         #length_of_probes_array = []
         i=0
         for length_of_probes_array in all_sets:
-            number_of_probes = number_of_included_links = run_duration_ms_ilp=max_len_of_probes_array=number_of_existing_links=number_of_switches=percent_of_hosts=links_monitored_percent=number_of_hosts=number_of_rules=number_of_flows= max_error_per_one_link= summation_of_all_link_delays_error=run_duration_ms_pso = 0
+            print ("\n\n\t\t*******")
+            number_of_probes = number_of_included_links = run_duration_ms_ilp=max_len_of_probes_array=number_of_existing_links=number_of_switches=percent_of_hosts=links_monitored_percent=NUMBER_OF_HOSTS=number_of_rules=number_of_flows= max_error_per_one_link= summation_of_all_link_delays_error=run_duration_ms_pso = 0
 
 
             max_len_of_probes_array = max(length_of_probes_array)
@@ -186,10 +195,10 @@ def main():
             logger.info("ILP Algorithm (PSF Module) run duration: {}ms\n".format(run_duration_ms_ilp))
             links_monitored_percent = round(number_of_included_links*1.0/number_of_existing_links,2)*100
 
+            
+            logger.info("percent of links monitored: {}.\n max length of probes array: {}".format(links_monitored_percent,max_len_of_probes_array))
             if links_monitored_percent < 100:
-                logger.info("{} percent of links monitored".format(links_monitored_percent))
-
-                csv_writer_results.writerow([number_of_probes,number_of_included_links,run_duration_ms_ilp,max_len_of_probes_array,number_of_existing_links,number_of_switches,percent_of_hosts,links_monitored_percent,number_of_hosts,number_of_rules,number_of_flows, round(max_error_per_one_link,2), round(summation_of_all_link_delays_error,2),run_duration_ms_pso])
+                csv_writer_results.writerow([number_of_probes,number_of_included_links,run_duration_ms_ilp,max_len_of_probes_array,number_of_existing_links,number_of_switches,percent_of_hosts,links_monitored_percent,NUMBER_OF_HOSTS,number_of_rules,number_of_flows, round(max_error_per_one_link,2), round(summation_of_all_link_delays_error,2),run_duration_ms_pso])
 
                 #exit(1)
                 i = i+1 
@@ -203,14 +212,12 @@ def main():
             pathes_path = base_output_path / "2.Pathes.txt"
             add_dic_to_file(node_based_path_array,pathes_path)
 
-
             # base_output_path = "../latest/outputs/"
             # pathes_path = base_output_path + "2.Pathes.txt"
             #
             # with open(pathes_path) as pathes_file:
             #     str_from_file = pathes_file.read().replace("\'","\"")
             #     pathes = json.loads(str_from_file)
-
 
 
             '''
@@ -228,7 +235,7 @@ def main():
             number_of_rules = len(rules)
             add_dic_to_file(number_of_rules,charts_data_dir / "number_of_needed_rules.txt")
             add_dic_to_file(number_of_flows,charts_data_dir / "number_of_needed_flows.txt")
-
+            logger.info("Number of flows: {}".format(number_of_flows))
             
             '''
             Command Packet Traffic Manager to generate traffic in network, by Hesam
@@ -243,6 +250,10 @@ def main():
 
             logger.info("Waiting for TGA instances to finish...")
             end_to_end_delay_matrix, list_of_traffic_patterns, length = th1.join()  # wait until thread 1 finishes
+
+            if len(end_to_end_delay_matrix) == 0 :
+                logger.error("Some trouble happened in TGM Instance, please check it.")
+                exit(0)
             logger.info("Waiting for TGA test instances to finish")
             end_to_end_delay_matrix_test, _ = th2.join() #wait until thread 2 finishes
 
@@ -280,14 +291,14 @@ def main():
 
             ########delay array###########
             #base_output_path = "./latest/outputs/"
-            end_to_end_delay_file_path = base_output_path/"3.TGM_end_to_end_delay_matrix.txt"
-            array_of_delays = []
-            with open(end_to_end_delay_file_path) as end_to_end_delay_file:
-                str_from_file = end_to_end_delay_file.read().replace("\'", "\"")
-                l = json.loads(str_from_file)
+            # end_to_end_delay_file_path = base_output_path/"3.TGM_end_to_end_delay_matrix.txt"
+            # array_of_delays = []
+            # with open(end_to_end_delay_file_path) as end_to_end_delay_file:
+            #     str_from_file = end_to_end_delay_file.read().replace("\'", "\"")
+            #     l = json.loads(str_from_file)
 
             min=[]
-            for item in l:
+            for item in end_to_end_delay_matrix_list:
                 for it in item.values():
                     min.append(it["min"])
 
@@ -311,6 +322,7 @@ def main():
             measured_link_delay = link_delay_measurement_PSO(array_of_delays, node_based_path_array, debug=debug)
             end_time = time.time()
             run_duration_ms_pso = round((end_time-start_time)*1000,3)
+            logger.info("PSO Algorithm (DMI Module) run duration: {}ms\n".format(run_duration_ms_pso))
 
             #add_dic_to_file (measured_link_delay, debug_dir / "4.DMI_measured_link_delay.txt")
             add_dic_to_file (measured_link_delay, base_output_path / Path("DMI") / "measured_link_delay.txt")
@@ -323,7 +335,7 @@ def main():
             add_dic_to_file (summation_of_all_link_delays_error, base_output_path / Path("DMI") / "summation_of_all_link_delays_error.txt" )
 
             
-            csv_writer_results.writerow([number_of_probes,number_of_included_links,run_duration_ms_ilp,max_len_of_probes_array,number_of_existing_links,number_of_switches,percent_of_hosts,links_monitored_percent,number_of_hosts,number_of_rules,number_of_flows, round(max_error_per_one_link,2), round(summation_of_all_link_delays_error,2),run_duration_ms_pso])
+            csv_writer_results.writerow([number_of_probes,number_of_included_links,run_duration_ms_ilp,max_len_of_probes_array,number_of_existing_links,number_of_switches,percent_of_hosts,links_monitored_percent,NUMBER_OF_HOSTS,number_of_rules,number_of_flows, round(max_error_per_one_link,2), round(summation_of_all_link_delays_error,2),run_duration_ms_pso])
             i = i+1 
             timer.update(i)
         
