@@ -16,16 +16,16 @@
           
           
     info( '*** Post configure coordinator and traffic manager hosts\n')#config coordinator switch, so coordinator can talk with controller
-    traffic_manager_host.cmdPrint('python3 ../../modules/traffic_generator/traffic_generator_manager_TGM.py&')
-    traffic_manager_host.cmdPrint('python3 ../../modules/traffic_generator/traffic_generator_manager_TGM.py --port 5050&')
+    traffic_manager_host.cmdPrint('python3 ../../../modules/traffic_generator/traffic_generator_manager_TGM.py&')
+    traffic_manager_host.cmdPrint('python3 ../../../modules/traffic_generator/traffic_generator_manager_TGM.py --port 5050&')
     
     info( '*** Running agents on hosts\n')
     for host in net.hosts:
         if "th" in host.name:
-            host.cmdPrint('python3 ../../modules/traffic_generator/traffic_generator_agent_TGA.py&')
+            host.cmdPrint('python3 ../../../modules/traffic_generator/traffic_generator_agent_TGA.py&')
             continue
         if "th" not in host.name and "tm_h" not in host.name and "coord_h" not in host.name:
-            host.cmdPrint('python3 ../../modules/traffic_generator/traffic_generator_agent_TGA.py&')
+            host.cmdPrint('python3 ../../../modules/traffic_generator/traffic_generator_agent_TGA.py&')
 
             
 

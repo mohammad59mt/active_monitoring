@@ -6,7 +6,7 @@ from pathlib import Path
 
 def calc_results():
     base_output_path = Path(dir_path)/Path("latest")/Path("outputs")
-    end_to_end_delay_file_path = base_output_path/Path("3.end_to_end_delay_matrix.txt")
+    end_to_end_delay_file_path = base_output_path/Path("3.TGM_end_to_end_delay_matrix.txt")
     actual_link_delay_path = base_output_path / Path("actual_link_delay_matrix.txt")
     pathes_path = base_output_path/ Path("2.Pathes.txt")
     end_to_end_delays = base_output_path / Path("end_to_end_delay_min_max_avg_actual.txt")
