@@ -84,7 +84,10 @@ def myNetwork():
 
     info( '*** Add hosts\n')
     h1 = net.addHost('h1', cls=Host, ip='10.0.0.1', defaultRoute=None)
-#    h2 = net.addHost('h2', cls=Host, ip='10.0.0.2', defaultRoute=None)
+    h2 = net.addHost('h2', cls=Host, ip='10.0.0.2', defaultRoute=None)
+    h3 = net.addHost('h3', cls=Host, ip='10.0.0.3', defaultRoute=None)
+    h4 = net.addHost('h4', cls=Host, ip='10.0.0.4', defaultRoute=None)
+    h5 = net.addHost('h5', cls=Host, ip='10.0.0.5', defaultRoute=None)
 
     info( '*** Add links\n')
     validDelayMatrix = {}
@@ -200,8 +203,11 @@ def myNetwork():
     validDelayMatrix [k2] =v
     net.addLink(s5, s4, cls=TCLink , **s_5_s_4)
 
-    net.addLink(h1, s1)
-    #net.addLink(h2, s7)
+    net.addLink(h1, s3)
+    net.addLink(h2, s7)
+    net.addLink(h3, s1)
+    net.addLink(h4, s8)
+    net.addLink(h5, s9)
 
 
 
