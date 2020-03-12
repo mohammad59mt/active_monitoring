@@ -201,11 +201,14 @@ def myNetwork():
     validDelayMatrix [k2] =v
     net.addLink(s5, s4, cls=TCLink , **s_5_s_4)
 
-    net.addLink(h1, s3)
-    net.addLink(h2, s7)
-    net.addLink(h3, s1)
+    # net.addLink(h1, s3)
+    # net.addLink(h2, s7)
+    # net.addLink(h3, s1)
 
-
+    net.addLink(h1, s1)
+    net.addLink(h2, s2)
+    net.addLink(h3, s9)
+    
 
 ###---Auto Generated Codes by autoTopoGenerator.py---###
     import os
