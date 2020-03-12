@@ -308,9 +308,9 @@ def link_delay_measurement_PSO(array_of_delays, node_based_path_array, init_pop_
 
     measured_link_delay = pso.measured_links_delay()
 
-    print('\n(source node, destination node): measured delay')
+    if debug: print('\n(source node, destination node): measured delay')
     for link in measured_link_delay:
-        print(link,':','{0:2.2f}'.format(measured_link_delay[link]))
+        if debug: print(link,':','{0:2.2f}'.format(measured_link_delay[link]))
 
     return  measured_link_delay
 
@@ -344,18 +344,18 @@ def link_delay_measurement_and_comparison_PSO(array_of_delays, node_based_path_a
     comparison, max_difference = compare_resutls(real_link_delay=real_link_delays, measured_link_delay=measured_link_delay)
     link_delay_error = 0
     str_to_file = ""
-    #print('\n(source node, destination node): real delay --> measured delay')
+    if debug: print('\n(source node, destination node): real delay --> measured delay')
     str_to_file = '\n(source node, destination node): real delay --> measured delay'
     for link in comparison:
         str_to_file = str_to_file +"\n{0}: {1:2.2f}-->{2:2.2f}".format(link,comparison[link][0],comparison[link][1])
-        #print(link,':','{0:2.2f}'.format(comparison[link][0]),'-->','{0:2.2f}'.format(comparison[link][1]))
+        if debug: print(link,':','{0:2.2f}'.format(comparison[link][0]),'-->','{0:2.2f}'.format(comparison[link][1]))
         link_delay_error += abs(comparison[link][0]-comparison[link][1])
 
     pso.print_error(decimal_size=2)
     str_to_file = str_to_file + "\n" + "Max error per one link: "+str(max_difference)
-    #print("Max error per one link: ", max_difference)
+    debug: print("Max error per one link: ", max_difference)
     str_to_file = str_to_file + "\n" + 'Summation of all link delays error: '+ str(link_delay_error)
-    #print('Summation of all link delays error: ', link_delay_error)
+    print('Summation of all link delays error: ', link_delay_error)
 
     if save_to_file_dir is not None:
         with open (save_to_file_dir,"+w") as f:
