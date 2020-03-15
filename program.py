@@ -77,7 +77,7 @@ def main():
     parse_flags()
 
     ###configs###
-    max_hop_count_path = 12
+    max_hop_count_path = 15
     SEQUENTIAL_LEN_OF_PROBE_ARRAYS = True
     #TOPOLOGY_EXCLUDE = ["Geant"]
     TOPOLOGY_EXCLUDE = [" "]
