@@ -395,3 +395,11 @@ class Rest():
 def create_dir_recursively (dir):
     import pathlib
     pathlib.Path(dir).mkdir(parents=True, exist_ok=True)
+
+def get_file_names_in_a_directory(dir):
+    import os
+    files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+    return files
+
+def sort_list_of_tupples_by_nth_element(l,n):
+    return sorted(l, key=lambda x: x[n])
