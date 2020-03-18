@@ -227,6 +227,7 @@ def main():
     evaluation_csv_path_barchart_summation_of_all_links_delay_max_len_of_route_all_solved = base_output_path / "csv" / "barchart_summation_of_all_links_delay_max_len_of_route_all_solved.csv"
     evaluation_csv_path_barchart_max_link_delay_error_max_len_of_route_all_solved = base_output_path / "csv" / "barchart_max_link_delay_error_max_len_of_route_all_solved.csv"
     evaluation_csv_path_barchart_real_and_measured_delay_max_len_of_route_all_solved = base_output_path / "csv" /  "{}_{}_barchart_real_and_measured_delay_max_len_of_route_all_solved.csv".format(TOPOLOGY_NAME,str(NUMBER_OF_HOSTS))
+    evaluation_csv_path_absolute_error_max_len_of_route_all_solved = base_output_path / "csv" / "absolute_error_max_len_of_route_all_solved.csv"
 
     
 
@@ -260,7 +261,8 @@ def main():
         open(evaluation_csv_path_barchart_bar_average_number_of_rules_per_switch_max_len_of_route_all_solved, 'a', newline='') as csv_file_barchart_bar_average_number_of_rules_per_switch_max_len_of_route_all_solved,\
         open(evaluation_csv_path_barchart_summation_of_all_links_delay_max_len_of_route_all_solved, 'a', newline='') as csv_file_barchart_summation_of_all_links_delay_max_len_of_route_all_solved,\
         open(evaluation_csv_path_barchart_max_link_delay_error_max_len_of_route_all_solved, 'a', newline='') as csv_file_barchart_max_link_delay_error_max_len_of_route_all_solved,\
-        open(evaluation_csv_path_barchart_real_and_measured_delay_max_len_of_route_all_solved, 'a', newline='') as csv_file_barchart_real_and_measured_delay_max_len_of_route_all_solved:
+        open(evaluation_csv_path_barchart_real_and_measured_delay_max_len_of_route_all_solved, 'a', newline='') as csv_file_barchart_real_and_measured_delay_max_len_of_route_all_solved,\
+        open(evaluation_csv_path_absolute_error_max_len_of_route_all_solved, 'a', newline='') as csv_file_absolute_error_max_len_of_route_all_solved:
         
 
 
@@ -279,6 +281,8 @@ def main():
 
         csv_writer_barchart_real_and_measured_delay_max_len_of_route_all_solved = csv.writer(csv_file_barchart_real_and_measured_delay_max_len_of_route_all_solved,delimiter =' ',quotechar =',',quoting=csv.QUOTE_MINIMAL)
 
+        csv_writer_absolute_error_max_len_of_route_all_solved = csv.writer(csv_file_absolute_error_max_len_of_route_all_solved,delimiter =' ',quotechar =',',quoting=csv.QUOTE_MINIMAL)
+
 
         csv_writer_results_all.writerow(["#number_of_probes","#number_of_included_links","#run_duration_ms","#max_len_of_probes_array","#number_of_existing_links","#number_of_switches","#percent_of_hosts","#links_monitored_percent","#number_of_hosts","#number_of_rules","#number_of_flows","max_error_per_one_link", "#summation_of_all_link_delays_error","#run_duration_ms_pso"])
 
@@ -292,8 +296,11 @@ def main():
 
         csv_writer_barchart_max_link_delay_error_max_len_of_route_all_solved.writerow(["#number_of_hosts","#max_link_delay_error_max_len_of_route_all_solved","###min_max_length_of_routes_all_topologies_solved = {}".format(min_max_length_of_routes_all_topologies_solved)])
 
-
         csv_writer_barchart_real_and_measured_delay_max_len_of_route_all_solved.writerow(["#number_of_hosts","#real_delay","#measured_delay","#link_id","#link_name","###min_max_length_of_routes_all_topologies_solved = {}".format(min_max_length_of_routes_all_topologies_solved)])
+
+        
+        csv_writer_absolute_error_max_len_of_route_all_solved.writerow(["#number_of_hosts","absolute_error","###min_max_length_of_routes_all_topologies_solved = {}".format(min_max_length_of_routes_all_topologies_solved)])
+        
         
         
         if debug: logger.info("topo_neighbourhood_matrix: {}".format(topo_neighbourhood_matrix))
@@ -508,6 +515,7 @@ def main():
                 csv_writer_barchart_summation_of_all_links_delay_max_len_of_route_all_solved.writerow([NUMBER_OF_HOSTS,summation_of_all_link_delays_error])
                 csv_writer_barchart_max_link_delay_error_max_len_of_route_all_solved.writerow([NUMBER_OF_HOSTS,max_error_per_one_link])
 
+                temp_sum_to_calculation_absolute_error = 0
                 link_id = 1
                 for item in sort_list_of_tupples_by_nth_element(link_real_and_measured_delay,0):
                     link_name = item[0]
@@ -515,6 +523,10 @@ def main():
                     estimated_delay = item[2]
                     csv_writer_barchart_real_and_measured_delay_max_len_of_route_all_solved.writerow([NUMBER_OF_HOSTS,real_delay,estimated_delay,link_id,'\"'+str(link_name)+'\"'])
                     link_id = link_id + 1
+                    temp_sum_to_calculation_absolute_error = temp_sum_to_calculation_absolute_error + abs(real_delay-estimated_delay)/estimated_delay 
+
+                absolute_percent_error = round((temp_sum_to_calculation_absolute_error/number_of_existing_links) * 100,2)
+                csv_writer_absolute_error_max_len_of_route_all_solved.writerow([NUMBER_OF_HOSTS,absolute_percent_error])
 
             i = i+1 
             timer.update(i)
