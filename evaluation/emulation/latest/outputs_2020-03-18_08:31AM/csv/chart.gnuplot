@@ -8,18 +8,18 @@ set key left top
 set output 'eval_Abilene_Max_Length_of_Routes_Number_of_Required_Flows.png'
 set yrange [0:40]
 set xrange [5:15]
-set xlabel 'Max length of monitoring flows (MLMF)'
+set xlabel 'Max Length of Routes'
 set ylabel 'Monitoring Overhead (Number of Flows)'
-plot 'solved_abilene_1.csv' u 4:11 w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:11 w lp t '2 Monitoring nodes','solved_abilene_3.csv' u 4:11 w lp t '3 Monitoring nodes','solved_abilene_4.csv' u 4:11 w lp t '4 Monitoring nodes','solved_abilene_5.csv' u 4:11 w lp t '5 Monitoring nodes'
+plot 'solved_abilene_1.csv' u 4:11 w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:11 w lp t '2 Monitoring node','solved_abilene_3.csv' u 4:11 w lp t '3 Monitoring node','solved_abilene_4.csv' u 4:11 w lp t '4 Monitoring node','solved_abilene_5.csv' u 4:11 w lp t '5 Monitoring node'
 
 
 set key right bottom
 set output 'eval_Abilene_Max_Length_of_Routes_Links_Monitored.png'
 set yrange [0:100]
 set xrange [2:15]
-set xlabel 'Max length of monitoring flows (MLMF)'
+set xlabel 'Max Length of Routes'
 set ylabel 'Links Monitored (%)'
-plot 'all_abilene_1.csv' u 4:8 w lp t '1 Monitoring node', 'all_abilene_2.csv' u 4:8 w lp t '2 Monitoring nodes','all_abilene_3.csv' u 4:8 w lp t '3 Monitoring nodes','all_abilene_4.csv' u 4:8 w lp t '4 Monitoring nodes','all_abilene_5.csv' u 4:8 w lp t '5 Monitoring nodes'
+plot 'all_abilene_1.csv' u 4:8 w lp t '1 Monitoring node', 'all_abilene_2.csv' u 4:8 w lp t '2 Monitoring node','all_abilene_3.csv' u 4:8 w lp t '3 Monitoring node','all_abilene_4.csv' u 4:8 w lp t '4 Monitoring node','all_abilene_5.csv' u 4:8 w lp t '5 Monitoring node'
 
 
 
@@ -27,9 +27,9 @@ set key top left
 set output 'eval_Abilene_Max_Length_of_Routes_Execution_time_ILP.png'
 set yrange [0:*]
 set xrange [2:15]
-set xlabel 'Max length of monitoring flows (MLMF)'
+set xlabel 'Max Length of Routes'
 set ylabel 'Execution Time of ILP (ms)'
-plot 'all_abilene_1.csv' u 4:3 w lp t '1 Monitoring node', 'all_abilene_2.csv' u 4:3 w lp t '2 Monitoring nodes','all_abilene_3.csv' u 4:3 w lp t '3 Monitoring nodes','all_abilene_4.csv' u 4:3 w lp t '4 Monitoring nodes','all_abilene_5.csv' u 4:3 w lp t '5 Monitoring nodes'
+plot 'all_abilene_1.csv' u 4:3 w lp t '1 Monitoring node', 'all_abilene_2.csv' u 4:3 w lp t '2 Monitoring node','all_abilene_3.csv' u 4:3 w lp t '3 Monitoring node','all_abilene_4.csv' u 4:3 w lp t '4 Monitoring node','all_abilene_5.csv' u 4:3 w lp t '5 Monitoring node'
 
 
 
@@ -38,9 +38,9 @@ set output 'eval_Abilene_Max_Length_of_Routes_Number_of_Required_Rules.png'
 set title 'Abilene'
 set yrange [0:170]
 set xrange [5:15]
-set xlabel 'Max length of monitoring flows (MLMF)'
+set xlabel 'Max Length of Routes'
 set ylabel 'Monitoring Overhead (Number of Rules)'
-plot 'solved_abilene_1.csv' u 4:10 w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:10 w lp t '2 Monitoring nodes','solved_abilene_3.csv' u 4:10 w lp t '3 Monitoring nodes','solved_abilene_4.csv' u 4:10 w lp t '4 Monitoring nodes','solved_abilene_5.csv' u 4:10 w lp t '5 Monitoring nodes'
+plot 'solved_abilene_1.csv' u 4:10 w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:10 w lp t '2 Monitoring node','solved_abilene_3.csv' u 4:10 w lp t '3 Monitoring node','solved_abilene_4.csv' u 4:10 w lp t '4 Monitoring node','solved_abilene_5.csv' u 4:10 w lp t '5 Monitoring node'
 
 
 set key left top
@@ -48,18 +48,18 @@ set output 'eval_Abilene_Max_Length_of_Max_error_per_one_link.png'
 set title 'Abilene'
 set yrange [0:15]
 set xrange [5:15]
-set xlabel 'Max length of monitoring flows (MLMF)'
+set xlabel 'Max Length of Routes'
 set ylabel 'Max Error Per One Link (ms)'
-plot 'solved_abilene_1.csv' u 4:12 w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:12 w lp t '2 Monitoring nodes','solved_abilene_3.csv' u 4:12 w lp t '3 Monitoring nodes','solved_abilene_4.csv' u 4:12 w lp t '4 Monitoring nodes','solved_abilene_5.csv' u 4:12 w lp t '5 Monitoring nodes'
+plot 'solved_abilene_1.csv' u 4:12 w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:12 w lp t '2 Monitoring node','solved_abilene_3.csv' u 4:12 w lp t '3 Monitoring node','solved_abilene_4.csv' u 4:12 w lp t '4 Monitoring node','solved_abilene_5.csv' u 4:12 w lp t '5 Monitoring node'
 
 
 set key left bottom
 set output 'eval_Abilene_Max_Length_of_Routes_Execution_time_PSO.png'
 set yrange [0:10]
 set xrange [5:15]
-set xlabel 'Max length of monitoring flows (MLMF)'
+set xlabel 'Max Length of Routes'
 set ylabel 'Execution time of PSO (s)'
-plot 'solved_abilene_1.csv' u 4:($14/1000) w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:($14/1000) w lp t '2 Monitoring nodes','solved_abilene_3.csv' u 4:($14/1000) w lp t '3 Monitoring nodes','solved_abilene_4.csv' u 4:($14/1000) w lp t '4 Monitoring nodes','solved_abilene_5.csv' u 4:($14/1000) w lp t '5 Monitoring nodes'
+plot 'solved_abilene_1.csv' u 4:($14/1000) w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:($14/1000) w lp t '2 Monitoring node','solved_abilene_3.csv' u 4:($14/1000) w lp t '3 Monitoring node','solved_abilene_4.csv' u 4:($14/1000) w lp t '4 Monitoring node','solved_abilene_5.csv' u 4:($14/1000) w lp t '5 Monitoring node'
 
 
 
@@ -70,9 +70,9 @@ set key left top
 set output 'eval_Abilene_Max_Length_of_Summation_of_All_Links_Error.png'
 set yrange [0:130]
 set xrange [5:15]
-set xlabel 'Max length of monitoring flows (MLMF)'
+set xlabel 'Max Length of Routes'
 set ylabel 'Summation of All Link Delays Error (ms)'
-plot 'solved_abilene_1.csv' u 4:13 w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:13 w lp t '2 Monitoring nodes','solved_abilene_3.csv' u 4:13 w lp t '3 Monitoring nodes','solved_abilene_4.csv' u 4:13 w lp t '4 Monitoring nodes','solved_abilene_5.csv' u 4:13 w lp t '5 Monitoring nodes'
+plot 'solved_abilene_1.csv' u 4:13 w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:13 w lp t '2 Monitoring node','solved_abilene_3.csv' u 4:13 w lp t '3 Monitoring node','solved_abilene_4.csv' u 4:13 w lp t '4 Monitoring node','solved_abilene_5.csv' u 4:13 w lp t '5 Monitoring node'
 
 
 set key left top
