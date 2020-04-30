@@ -11,9 +11,10 @@ from utilities import TopoInteractions
 ###configs###
 max_hop_count_path = 29
 SEQUENTIAL_LEN_OF_PROBE_ARRAYS = True
-TOPOLOGY_EXCLUDE = ["Geant"]
+TOPOLOGY_EXCLUDE = ["Geant","Surfnet"]
 #TOPOLOGY_EXCLUDE = [" "]
 DURATION_RUN_LIMIT_MS = 0
+NO_TIMER = True
 
 def get_file_names_in_a_directory(dir):
     import os
@@ -99,7 +100,7 @@ for file_name in get_file_names_in_a_directory(topology_matrix_dir):
                 hosts.add(item[0])
         number_of_hosts = len (hosts)
 
-        percent_of_hosts = int(file_name.replace(".txt","").split("_")[3])
+        percent_of_hosts = int(number_of_hosts/number_of_switches*100)
         final_output[-1]["percent_of_hosts"] = percent_of_hosts
         final_output[-1]["number_of_hosts"] = number_of_hosts
         final_output[-1]["number_of_switches"] = number_of_switches
@@ -124,12 +125,14 @@ for file_name in get_file_names_in_a_directory(topology_matrix_dir):
             all_sets = get_all_subset(path_length_array)
 
         #initialize widgets
-        widgets = ['topo: %s, hosts: %s, switches: %s, links: %s, number of probe arrays: %s --> '%(final_output[-1]["topo_name"],final_output[-1]["percent_of_hosts"],good_outputs[-1]["number_of_switches"],number_of_existing_links,len(all_sets)), pb.Percentage(), ' ', 
+        if not NO_TIMER:
+            widgets = ['topo: %s, hosts: %s, switches: %s, links: %s, number of probe arrays: %s --> '%(final_output[-1]["topo_name"],final_output[-1]["percent_of_hosts"],good_outputs[-1]["number_of_switches"],number_of_existing_links,len(all_sets)), pb.Percentage(), ' ', 
             pb.Bar(marker=pb.RotatingMarker()), ' ', pb.ETA()]
 
 
         #initialize timer
-        timer = pb.ProgressBar(widgets=widgets, maxval=len(all_sets)).start()
+        if not NO_TIMER:
+            timer = pb.ProgressBar(widgets=widgets, maxval=len(all_sets)).start()
 
         i=0
         for length_of_probes_array in all_sets:
@@ -147,7 +150,8 @@ for file_name in get_file_names_in_a_directory(topology_matrix_dir):
                 good_outputs[-1]["runs_info"].append({"number_of_probes":number_of_probes,"number_of_existing_links":number_of_existing_links,"number_of_included_links":number_of_included_links,"run_duration_ms":run_duration_ms,"length_of_probes_array":length_of_probes_array,"links_monitored_percent":links_monitored_percent,"number_of_hosts":number_of_hosts,"number_of_rules":number_of_rules})
                 csv_writer_good.writerow([number_of_probes,number_of_included_links,run_duration_ms,len(length_of_probes_array),number_of_existing_links,number_of_switches,percent_of_hosts,links_monitored_percent,number_of_hosts,number_of_rules])
             i = i+1 
-            timer.update(i)
+            if not NO_TIMER:
+                timer.update(i)
             if run_duration_ms>DURATION_RUN_LIMIT_MS and DURATION_RUN_LIMIT_MS is not 0:
                 print("duration run limit: %s"%(run_duration_ms))
                 break
@@ -157,7 +161,8 @@ for file_name in get_file_names_in_a_directory(topology_matrix_dir):
         write_object_to_file(final_output[-1],Path("evaluation/PSF") / Path(final_output[-1]["topo_name"]),Path("all_"+file_name))
         write_object_to_file(good_outputs[-1],Path("evaluation/PSF") / Path(final_output[-1]["topo_name"]),Path("good_"+file_name))
         
-        timer.finish()
+        if not NO_TIMER:
+            timer.finish()
 
 
 write_object_to_file(final_output,Path("evaluation/PSF"),Path("all_"+file_name+".txt"))
