@@ -136,7 +136,7 @@ def try_to_continue_from_last_run():
     if isdir:
         warning_text = None
         if not args.dont_continue_from_last_run:
-            warning_text = "You ran for this number of hosts earlier. You can use --new flag or please confirm that you want to overwrite it without new run? y/n\n"
+            warning_text = "You ran for this number of hosts ({}) earlier. You can use --new flag or please confirm that you want to overwrite it without new run? y/n\n".format(args.number_of_hosts)
         else:
             warning_text = "Same directory for you output is avaiable \"{}\", You can use --new flag or please confirm that you want to overwrite it without new run? y/n\n".format(base_output_path)
         for i in range(3):
@@ -149,30 +149,30 @@ def try_to_continue_from_last_run():
                 break
 
 
-        f = None
-        try:
-            f = open (history_file_path,"r+")
-        except IOError:
-            f = open (history_file_path,"w+")
+    f = None
+    try:
+        f = open (history_file_path,"r+")
+    except IOError:
+        f = open (history_file_path,"w+")
 
-        try:
-            data = f.read()
-            data = data.split("\n")
-            last_run_output_path = data[-1]
-                
-            #f.seek(0)
-            if len(data) is 0:
-                f.write(str(base_output_path)) #save last run dir
-            elif last_run_output_path is "":
-                f.write(str(base_output_path)) #save last run dir
-            else:
-                f.write("\n"+str(base_output_path)) #save last run dir
-            #f.truncate()
-        except Exception as e:
-            logger.info(e) 
-            exit(2)
-        
-        f.close()
+    try:
+        data = f.read()
+        data = data.split("\n")
+        last_run_output_path = data[-1]
+            
+        #f.seek(0)
+        if len(data) is 0:
+            f.write(str(base_output_path)) #save last run dir
+        elif last_run_output_path is "":
+            f.write(str(base_output_path)) #save last run dir
+        else:
+            f.write("\n"+str(base_output_path)) #save last run dir
+        #f.truncate()
+    except Exception as e:
+        logger.info(e) 
+        exit(2)
+    
+    f.close()
 
     create_dir_recursively (emulation_results_dir)
     create_dir_recursively (debug_dir)
