@@ -28,7 +28,7 @@ set output 'eval_Abilene_Max_Length_of_Routes_Execution_time_ILP.png'
 set yrange [0:*]
 set xrange [2:15]
 set xlabel 'Max length of monitoring flows (MLMF)'
-set ylabel 'Execution Time of ILP (ms)'
+set ylabel 'Execution Time (ms)'
 plot 'all_abilene_1.csv' u 4:3 w lp t '1 Monitoring node', 'all_abilene_2.csv' u 4:3 w lp t '2 Monitoring nodes','all_abilene_3.csv' u 4:3 w lp t '3 Monitoring nodes','all_abilene_4.csv' u 4:3 w lp t '4 Monitoring nodes','all_abilene_5.csv' u 4:3 w lp t '5 Monitoring nodes'
 
 
@@ -58,7 +58,7 @@ set output 'eval_Abilene_Max_Length_of_Routes_Execution_time_PSO.png'
 set yrange [0:10]
 set xrange [5:15]
 set xlabel 'Max length of monitoring flows (MLMF)'
-set ylabel 'Execution time of PSO (s)'
+set ylabel 'Execution time (s)'
 plot 'solved_abilene_1.csv' u 4:($14/1000) w lp t '1 Monitoring node', 'solved_abilene_2.csv' u 4:($14/1000) w lp t '2 Monitoring nodes','solved_abilene_3.csv' u 4:($14/1000) w lp t '3 Monitoring nodes','solved_abilene_4.csv' u 4:($14/1000) w lp t '4 Monitoring nodes','solved_abilene_5.csv' u 4:($14/1000) w lp t '5 Monitoring nodes'
 
 
