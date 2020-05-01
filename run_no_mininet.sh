@@ -9,7 +9,7 @@ then
       exit 2
 fi
 python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 1 --new
-python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
-python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
-python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
+python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 2
+python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 3
+python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 4
 python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
