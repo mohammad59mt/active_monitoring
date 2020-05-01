@@ -8,8 +8,8 @@ then
       echo "Error: Please enter last run path"
       exit 2
 fi
-python3 program.py --pb --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 1 --new
-python3 program.py --pb --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
-python3 program.py --pb --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
-python3 program.py --pb --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
-python3 program.py --pb --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
+python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 1 --new
+python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
+python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
+python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
+python3 program.py --pop 50 --iter 50 --no-mininet --toponame abilene --last-result-path $1 --n 5
