@@ -188,6 +188,12 @@ def add_dic_to_file(dic,filepath):
     f.write(str(dic))
     f.close()
 
+def load_dic_from_file(filepath):
+    f = open(filepath, "r+")
+    dic = eval(f.read())
+    f.close()
+    return  dic
+
 def __convert_to_colon_separated (a):
     #a = "0000000000000001"
     for j in range(0, int(len(a) / 2)):
